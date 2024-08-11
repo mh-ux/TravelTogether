@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenExpired } from '../utils/authUtils'; // Import the utility function
+import ExpenseForm from '../components/ExpenseForm';
+import ExpenseList from '../components/ExpenseList';
 
 const Trip = () => {
     const { tripId } = useParams();
@@ -11,6 +13,7 @@ const Trip = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [updatedTrip, setUpdatedTrip] = useState({});
     const navigate = useNavigate();
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
         const fetchTrip = async () => {
@@ -98,6 +101,24 @@ const Trip = () => {
                 ))}
             </ul>
             <button onClick={() => navigate(`/add-users/${tripId}`)}>Add Users</button>
+
+            <div>
+      <h1>{trip.name} Details</h1>
+      <p>Total Spent: ${trip.totalSpent}</p>
+      <p>Total Received: ${trip.totalReceived}</p>
+
+      <h2>User Balances</h2>
+      <ul>
+        {users.map(user => (
+          <li key={user._id}>
+            {user.name} - Spent: ${user.totalSpent} | Received: ${user.totalReceived}
+          </li>
+        ))}
+      </ul>
+
+      <ExpenseForm tripId={tripId} />
+      <ExpenseList tripId={tripId} />
+    </div>
 
             {isEditing ? (
                 <div>

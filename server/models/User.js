@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+
+    totalSpent: { type: Number, default: 0 }, // Total spent on trips
+    totalReceived: { type: Number, default: 0 }, // Total received (if reimbursement)
+
     resetPasswordToken: String,
     resetPasswordExpires: Date,
 });

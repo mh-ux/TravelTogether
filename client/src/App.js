@@ -18,7 +18,6 @@ import CalendarView from './pages/CalendarView';
 import Trip from './pages/Trip';
 import AddUsers from './pages/AddUsers'; // Import AddUsers component
 
-
 const App = () => {
     return (
         <Router>

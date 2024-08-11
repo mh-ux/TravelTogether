@@ -1,75 +1,60 @@
+// controllers/itineraryController.js
 const Itinerary = require('../models/Itinerary');
+const Trip = require('../models/Trip');
 
-const getItineraryByTripId = async (req, res) => {
-    const { tripId } = req.params;
-    try {
-        const itinerary = await Itinerary.findOne({ tripId });
-        if (!itinerary) {
-            return res.status(404).json({ message: 'Itinerary not found' });
-        }
-        res.status(200).json(itinerary);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
+exports.getAllItineraries = async (req, res) => {
+  try {
+    const itineraries = await Itinerary.find().populate('trip');
+    res.json(itineraries);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-const addItemToItinerary = async (req, res) => {
-    const { tripId } = req.params;
-    const { eventName, type, dates, time, links, description, pictures } = req.body;
+exports.createItinerary = async (req, res) => {
+  const { name, location, date, tripId } = req.body;
 
-    console.log('Received data:', req.body);
-
-    try {
-        const itinerary = await Itinerary.findOne({ tripId });
-        if (!itinerary) {
-            return res.status(404).json({ message: 'Itinerary not found' });
-        }
-
-        const newItem = {
-            eventName,
-            type,
-            dates,
-            time,
-            links: Array.isArray(links) ? links : links.split(',').map(link => link.trim()),
-            description,
-            pictures: Array.isArray(pictures) ? pictures : pictures.split(',').map(picture => picture.trim())
-        };
-
-        console.log('New item:', newItem);
-
-        itinerary.items.push(newItem);
-
-        await itinerary.save();
-        res.status(200).json(itinerary);
-    } catch (error) {
-        console.error('Error adding item to itinerary:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+  try {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ message: 'Trip not found' });
     }
+
+    const itinerary = new Itinerary({ name, location, date, trip: tripId });
+    const newItinerary = await itinerary.save();
+
+    trip.itineraries.push(newItinerary._id);
+    await trip.save();
+
+    res.status(201).json(newItinerary);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 };
 
-const deleteItemFromItinerary = async (req, res) => {
-    const { tripId, itemId } = req.params;
-    try {
-        const itinerary = await Itinerary.findOne({ tripId });
-        if (!itinerary) {
-            return res.status(404).json({ message: 'Itinerary not found' });
-        }
+exports.deleteItinerary = async (req, res) => {
+  try {
+    const itinerary = await Itinerary.findById(req.params.id);
+    if (!itinerary) return res.status(404).json({ message: 'Itinerary not found' });
 
-        const itemIndex = itinerary.items.findIndex(item => item._id.toString() === itemId);
-        if (itemIndex === -1) {
-            return res.status(404).json({ message: 'Item not found' });
-        }
-
-        itinerary.items.splice(itemIndex, 1);
-        await itinerary.save();
-        res.status(200).json(itinerary);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+    const trip = await Trip.findById(itinerary.trip);
+    if (trip) {
+      trip.itineraries.pull(itinerary._id);
+      await trip.save();
     }
+
+    await Itinerary.deleteOne({ _id: req.params.id });
+    res.json({ message: 'Itinerary deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-module.exports = {
-    getItineraryByTripId,
-    addItemToItinerary,
-    deleteItemFromItinerary,
+exports.getItinerariesByTrip = async (req, res) => {
+  try {
+    const itineraries = await Itinerary.find({ trip: req.params.tripId });
+    res.json(itineraries);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
