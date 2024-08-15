@@ -1,36 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
+import styled from 'styled-components';
 
-const ExpenseList = ({ tripId }) => {
-  const [expenses, setExpenses] = useState([]);
+const ExpenseListContainer = styled.div`
+  padding: 20px;
+  background-color: #fff;
+`;
 
-  useEffect(() => {
-    axios.get(`/api/expenses/trip/${tripId}`).then(res => setExpenses(res.data))
-    .catch(err => console.error(err));
-  }, [tripId]);
+const ExpenseItem = styled.div`
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const ExpenseTitle = styled.h3`
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+`;
+
+const ExpenseDetail = styled.p`
+  font-size: 14px;
+  color: #888;
+`;
+
+const ExpenseList = ({ expenses = [] }) => {
+  if (expenses.length === 0) {
+    return <div>No expenses available</div>;
+  }
 
   return (
-    <div>
-      <h2>Expenses</h2>
-      <ul>
-        {expenses.map(expense => (
-          <li key={expense._id}>
-            <strong>{expense.title}</strong> - ${expense.amount} <br/>
-            <small>Date: {expense.date}</small> <br/>
-            <small>Payer: {expense.payer.name}</small> <br/>
-            <small>Category: {expense.category}</small> <br/>
-            <small>Split: {expense.splitOption}</small>
-            <ul>
-              {expense.splitBetween.map((split, index) => (
-                <li key={index}>
-                  {split.user.name} - ${split.amount}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ExpenseListContainer>
+      {expenses.map((expense, index) => (
+        <ExpenseItem key={index}>
+          <ExpenseTitle>{expense.title}</ExpenseTitle>
+          <ExpenseDetail>Amount: ${expense.amount}</ExpenseDetail>
+        </ExpenseItem>
+      ))}
+    </ExpenseListContainer>
   );
 };
 

@@ -28,5 +28,30 @@ router.get('/:tripId/group', async (req, res) => {
 router.get('/:tripId', protect, getTripById);
 router.put('/:tripId', protect, updateTrip);
 router.post('/create', protect, createTrip);
+router.post('/:tripId/guests', async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
+    if (!trip) return res.status(404).send('Trip not found');
+
+    trip.guests.push(req.body);
+    await trip.save();
+
+    res.json(trip.guests);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+// Get the guest list for a trip
+router.get('/:tripId/guests', async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
+    if (!trip) return res.status(404).send('Trip not found');
+
+    res.json(trip.guests);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
 
 module.exports = router;

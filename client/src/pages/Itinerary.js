@@ -195,7 +195,7 @@ const Itinerary = () => {
         return <div>{error}</div>;
     }
 
-    if (!itinerary) {
+    if (!itinerary || !itinerary.items) {
         return <div>Itinerary not found</div>;
     }
 

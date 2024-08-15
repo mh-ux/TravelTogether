@@ -12,6 +12,13 @@ const TripSchema = new mongoose.Schema({
     expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Expense' }], // Added expenses array
     totalSpent: { type: Number, default: 0 }, // Total spent on the trip
   totalReceived: { type: Number, default: 0 }, // Total received (from reimbursements)
+  guests: [
+    {
+      name: String,
+      contact: String,
+      rsvp: { type: String, enum: ['Attending', 'Not Attending', 'Maybe'], default: 'Maybe' },
+    },
+  ],
 });
 
 const Trip = mongoose.model('Trip', TripSchema);

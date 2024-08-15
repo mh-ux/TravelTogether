@@ -1,21 +1,21 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const ExpenseSchema = new Schema({
+const ExpenseSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  date: { type: Date, required: true },
-  category: { type: String, required: true },
+  date: { type: Date, default: Date.now },
+  category: { type: String },
   amount: { type: Number, required: true },
-  reimbursement: { type: Boolean, default: false },
-  payer: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  splitBetween: [{ 
-    user: { type: Schema.Types.ObjectId, ref: 'User' },
-    amount: { type: Number }
-  }],
+  payer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  splitBetween: [
+    {
+      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      amount: { type: Number },
+    },
+  ],
   splitOption: { type: String, enum: ['equally', 'unequally'], default: 'equally' },
+  reimbursement: { type: Boolean, default: false },
   notes: { type: String },
-  trip: { type: Schema.Types.ObjectId, ref: 'Trip', required: true }, // Tied to trip
-  createdAt: { type: Date, default: Date.now }
+  trip: { type: mongoose.Schema.Types.ObjectId, ref: 'Trip', required: true },
 });
 
 module.exports = mongoose.model('Expense', ExpenseSchema);

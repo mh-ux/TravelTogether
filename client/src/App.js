@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -9,7 +8,6 @@ import InviteMember from './pages/InviteMember';
 import GroupProfile from './pages/GroupProfile';
 import CreateTrip from './pages/CreateTrip';
 import TripList from './pages/TripList';
-//import TripDetails from './pages/TripDetails';
 import InviteToTrip from './pages/InviteMember';
 import JoinTrip from './pages/JoinTrip';
 import Home from './pages/Home';
@@ -17,12 +15,12 @@ import Itinerary from './pages/Itinerary';
 import CalendarView from './pages/CalendarView';
 import Trip from './pages/Trip';
 import AddUsers from './pages/AddUsers'; // Import AddUsers component
-import styled from 'styled-components/native';
+import NavigationBar from './components/Navbar'; // Ensure this matches the exact file name
 
 const App = () => {
     return (
         <Router>
-            <Navbar />
+            <NavigationBar />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/register" element={<Register />} />
