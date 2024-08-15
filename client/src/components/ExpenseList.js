@@ -1,4 +1,3 @@
-// src/components/ExpenseList.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -8,7 +7,6 @@ const ExpenseList = ({ tripId }) => {
   useEffect(() => {
     axios.get(`/api/expenses/trip/${tripId}`).then(res => setExpenses(res.data))
     .catch(err => console.error(err));
-    
   }, [tripId]);
 
   return (
@@ -17,7 +15,18 @@ const ExpenseList = ({ tripId }) => {
       <ul>
         {expenses.map(expense => (
           <li key={expense._id}>
-            {expense.description} - ${expense.amount} - {expense.splitOption}
+            <strong>{expense.title}</strong> - ${expense.amount} <br/>
+            <small>Date: {expense.date}</small> <br/>
+            <small>Payer: {expense.payer.name}</small> <br/>
+            <small>Category: {expense.category}</small> <br/>
+            <small>Split: {expense.splitOption}</small>
+            <ul>
+              {expense.splitBetween.map((split, index) => (
+                <li key={index}>
+                  {split.user.name} - ${split.amount}
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>

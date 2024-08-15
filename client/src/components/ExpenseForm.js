@@ -7,8 +7,8 @@ const ExpenseForm = ({ tripId }) => {
   const [category, setCategory] = useState('general');
   const [amount, setAmount] = useState('');
   const [payer, setPayer] = useState('');
-  const [splitBetween, setSplitBetween] = useState([]);  // Used here
-  const [users, setUsers] = useState([]);  // Used here
+  const [splitBetween, setSplitBetween] = useState([]);
+  const [users, setUsers] = useState([]);
   const [splitOption, setSplitOption] = useState('equally');
   const [reimbursement, setReimbursement] = useState(false);
   const [notes, setNotes] = useState('');
@@ -36,13 +36,23 @@ const ExpenseForm = ({ tripId }) => {
         .catch(err => console.error(err));
     }
   }, [groupId]);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const expense = { title, date, category, amount, payer, splitBetween: splitDetails, splitOption, reimbursement, notes, tripId };
       await axios.post('/api/expenses', expense);
       alert('Expense added successfully');
+      // Reset form fields after submission
+      setTitle('');
+      setDate('');
+      setCategory('general');
+      setAmount('');
+      setPayer('');
+      setSplitBetween([]);
+      setSplitDetails([]);
+      setReimbursement(false);
+      setNotes('');
     } catch (error) {
       alert('Error adding expense');
     }
@@ -66,12 +76,30 @@ const ExpenseForm = ({ tripId }) => {
     }
   };
 
+  const handleSplitBetweenChange = (e) => {
+    const selectedUsers = Array.from(e.target.selectedOptions, option => option.value);
+    setSplitBetween(selectedUsers);
+
+    if (splitOption === 'equally') {
+      const equalSplit = selectedUsers.map(user => ({ user, amount: amount / selectedUsers.length }));
+      setSplitDetails(equalSplit);
+    } else {
+      const unequalSplit = selectedUsers.map(user => ({ user, amount: 0 }));
+      setSplitDetails(unequalSplit);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Expense Title" required />
       <input type="date" value={date} onChange={e => setDate(e.target.value)} required />
       <select value={category} onChange={e => setCategory(e.target.value)} required>
-        {/* Category options here */}
+        {/* Add your category options here */}
+        <option value="general">General</option>
+        <option value="food">Food</option>
+        <option value="transportation">Transportation</option>
+        <option value="lodging">Lodging</option>
+        {/* Add more categories as needed */}
       </select>
       <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Amount" required />
       <label>
@@ -83,6 +111,14 @@ const ExpenseForm = ({ tripId }) => {
         {users.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
       </select>
       <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notes" />
+
+      <div>
+        <label>Split Between:</label>
+        <select multiple value={splitBetween} onChange={handleSplitBetweenChange}>
+          {users.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
+        </select>
+      </div>
+
       <div>
         <label>
           <input type="radio" value="equally" checked={splitOption === 'equally'} onChange={() => handleSplitOptionChange('equally')} />
@@ -93,6 +129,7 @@ const ExpenseForm = ({ tripId }) => {
           Split Unequally
         </label>
       </div>
+
       {splitOption === 'unequally' && splitBetween.map((userId, index) => (
         <div key={userId}>
           <label>{users.find(user => user._id === userId)?.name}</label>
@@ -104,6 +141,7 @@ const ExpenseForm = ({ tripId }) => {
           />
         </div>
       ))}
+
       <button type="submit">Add Expense</button>
     </form>
   );
