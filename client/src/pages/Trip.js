@@ -120,6 +120,7 @@ const Trip = () => {
       <ExpenseList tripId={tripId} />
     </div>
 
+
             {isEditing ? (
                 <div>
                     <h3>Edit Trip Details</h3>

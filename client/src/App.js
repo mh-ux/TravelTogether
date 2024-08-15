@@ -17,6 +17,7 @@ import Itinerary from './pages/Itinerary';
 import CalendarView from './pages/CalendarView';
 import Trip from './pages/Trip';
 import AddUsers from './pages/AddUsers'; // Import AddUsers component
+import styled from 'styled-components/native';
 
 const App = () => {
     return (
@@ -44,6 +45,10 @@ const App = () => {
             </Routes>
         </Router>
     );
+
+    
 };
+
+
 
 export default App;

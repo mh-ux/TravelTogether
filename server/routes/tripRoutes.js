@@ -2,6 +2,7 @@ const express = require('express');
 const { check } = require('express-validator');
 const { createTrip, getAllTrips, getTripById, updateTrip } = require('../controllers/tripController');
 const { protect } = require('../middleware/authMiddleware');
+const Trip = require('../models/Trip'); 
 
 const router = express.Router();
 
@@ -15,6 +16,15 @@ router.post('/create', [
 ], createTrip);
 
 router.get('/', protect, getAllTrips);
+router.get('/:tripId/group', async (req, res) => {
+    try {
+      const trip = await Trip.findById(req.params.tripId).populate('group');
+      if (!trip) return res.status(404).send('Trip not found');
+      res.json({ groupId: trip.group._id });
+    } catch (err) {
+      res.status(500).send('Server error');
+    }
+  });
 router.get('/:tripId', protect, getTripById);
 router.put('/:tripId', protect, updateTrip);
 router.post('/create', protect, createTrip);

@@ -13,11 +13,30 @@ const ExpenseForm = ({ tripId }) => {
   const [reimbursement, setReimbursement] = useState(false);
   const [notes, setNotes] = useState('');
   const [splitDetails, setSplitDetails] = useState([]);
+  const [groupId, setGroupId] = useState(null);
 
   useEffect(() => {
-    axios.get('/api/users').then(res => setUsers(res.data));  // Set users here
-  }, []);
+    // Fetch groupId using tripId
+    const fetchGroupId = async () => {
+      try {
+        const response = await axios.get(`/api/trips/${tripId}/group`);
+        setGroupId(response.data.groupId);
+      } catch (error) {
+        console.error('Error fetching groupId:', error);
+      }
+    };
+    fetchGroupId();
+  }, [tripId]);
 
+  useEffect(() => {
+    if (groupId) {
+      // Fetch users using groupId
+      axios.get(`/api/groups/${groupId}/users`)
+        .then(res => setUsers(res.data))
+        .catch(err => console.error(err));
+    }
+  }, [groupId]);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
